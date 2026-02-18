@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blockchain Viewer - Smart Railway System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .block-card {
+            background: #f8f9fa;
+            border-left: 4px solid #3b82f6;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+        .block-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        .hash-display {
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            background: #1f2937;
+            color: #10b981;
+            padding: 10px;
+            border-radius: 5px;
+            word-break: break-all;
+        }
+        .genesis-block {
+            border-left-color: #10b981 !important;
+            background: #d1fae5;
+        }
+        .chain-status {
+            font-size: 1.5rem;
+            padding: 20px;
+            text-align: center;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/admin/dashboard">
+                <i class="fas fa-train"></i> Smart Railway Admin
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/dashboard">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/crowd-update">Crowd Update</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/alerts">Alerts</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/admin/blockchain">Blockchain</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/train-availability">Train Availability</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/logout">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-link"></i> Blockchain Data Viewer
+            </div>
+            <div class="card-body">
+                <div class="chain-status {% if is_valid %}bg-success text-white{% else %}bg-danger text-white{% endif %}">
+                    {% if is_valid %}
+                        <i class="fas fa-check-circle"></i> Blockchain is Valid & Secure
+                    {% else %}
+                        <i class="fas fa-exclamation-triangle"></i> Blockchain Integrity Compromised!
+                    {% endif %}
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                        <div class="stats-card">
+                            <div class="icon">
+                                <i class="fas fa-cubes" style="color: #3b82f6;"></i>
+                            </div>
+                            <div class="number">{{ total_blocks }}</div>
+                            <div class="label">Total Blocks</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="stats-card">
+                            <div class="icon">
+                                <i class="fas fa-shield-alt" style="color: #10b981;"></i>
+                            </div>
+                            <div class="number">256-bit</div>
+                            <div class="label">SHA Encryption</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="stats-card">
+                            <div class="icon">
+                                <i class="fas fa-lock" style="color: #f59e0b;"></i>
+                            </div>
+                            <div class="number">100%</div>
+                            <div class="label">Immutable</div>
+                        </div>
+                    </div>
+                </div>
+
+                <h5 class="mb-3"><i class="fas fa-database"></i> Blockchain Ledger</h5>
+                
+                {% for block in blocks %}
+                    <div class="card block-card {% if block.index == 0 %}genesis-block{% endif %}">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-12 mb-3">
+                                    <h5>
+                                        {% if block.index == 0 %}
+                                            <i class="fas fa-flag"></i> Genesis Block
+                                        {% else %}
+                                            <i class="fas fa-cube"></i> Block #{{ block.index }}
+                                        {% endif %}
+                                    </h5>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <strong><i class="fas fa-clock"></i> Timestamp:</strong><br>
+                                    <small>{{ block.timestamp }}</small>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <strong><i class="fas fa-database"></i> Data Type:</strong><br>
+                                    {% if block.data is string %}
+                                        <span class="badge badge-info">{{ block.data }}</span>
+                                    {% else %}
+                                        <span class="badge badge-success">{{ block.data.get('type', 'Unknown') }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            {% if block.data is not string %}
+                                <div class="row mb-3">
+                                    <div class="col-12">
+                                        <strong><i class="fas fa-info-circle"></i> Block Data:</strong><br>
+                                        <div class="alert alert-info mt-2">
+                                            {% for key, value in block.data.items() %}
+                                                <strong>{{ key }}:</strong> {{ value }}<br>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+
+                            <div class="row mb-2">
+                                <div class="col-12">
+                                    <strong><i class="fas fa-fingerprint"></i> Block Hash:</strong>
+                                    <div class="hash-display mt-2">{{ block.hash }}</div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-12">
+                                    <strong><i class="fas fa-link"></i> Previous Hash:</strong>
+                                    <div class="hash-display mt-2">{{ block.previous_hash }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+
+                <div class="alert alert-success">
+                    <strong><i class="fas fa-info-circle"></i> About Blockchain Security:</strong>
+                    <ul class="mb-0 mt-2">
+                        <li>Each block contains a cryptographic hash of the previous block</li>
+                        <li>Any tampering with data changes the hash, breaking the chain</li>
+                        <li>All transactions are permanent and cannot be altered</li>
+                        <li>256-bit SHA encryption ensures maximum security</li>
+                        <li>Distributed ledger technology for transparency</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy;Smart Railway System - Blockchain Secured</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

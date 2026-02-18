@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crowd Update - Smart Railway System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/admin/dashboard">
+                <i class="fas fa-train"></i> Smart Railway Admin
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/dashboard">Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/admin/crowd-update">Crowd Update
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/logout">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="row">
+            <div class="col-lg-5 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-plus-circle"></i> Add New Crowd Update
+                    </div>
+                    <div class="card-body">
+                        <form method="POST">
+                            <div class="form-group mb-3">
+                                <label class="form-label">
+                                    <i class="fas fa-map-marker-alt"></i> Station Name *
+                                </label>
+                                <select class="form-select" name="station_name" id="stationSelect" required>
+                                    <option value="">Select Station</option>
+                                    {% for station in stations %}
+                                        <option value="{{ station }}">{{ station }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label class="form-label">
+                                    <i class="fas fa-signal"></i> Crowd Level *
+                                </label>
+                                <select class="form-select" name="crowd_level" required>
+                                    <option value="">Select Level</option>
+                                    <option value="Low">🟢 Low - Comfortable</option>
+                                    <option value="Medium">🟡 Medium - Moderate</option>
+                                    <option value="High">🔴 High - Crowded</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label class="form-label">
+                                    <i class="fas fa-hashtag"></i> Platform Number
+                                </label>
+                                <select class="form-select" name="platform_no" id="platformSelect">
+                                    <option value="">Select Platform</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label class="form-label">
+                                    <i class="fas fa-train"></i> Train Name/Number
+                                </label>
+                                <select class="form-select" name="train_name">
+                                    <option value="">Select Train</option>
+                                    {% for train in trains %}
+                                        <option value="{{ train.name }} - {{ train.number }}">
+                                            {{ train.name }} - {{ train.number }} ({{ train.route }})
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="form-group mb-4">
+                                <label class="form-label">
+                                    <i class="fas fa-comment"></i> Remarks
+                                </label>
+                                <textarea class="form-control" name="remarks" rows="3" 
+                                          placeholder="Additional information..."></textarea>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-save"></i> Save Update
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-7">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-history"></i> All Crowd Updates
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Station</th>
+                                        <th>Level</th>
+                                        <th>Platform</th>
+                                        <th>Train</th>
+                                        <th>Updated</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% if crowd_updates %}
+                                        {% for update in crowd_updates %}
+                                            <tr>
+                                                <td><strong>{{ update.station_name }}</strong></td>
+                                                <td>
+                                                    {% if update.crowd_level == 'Low' %}
+                                                        <span class="badge badge-low">🟢 Low</span>
+                                                    {% elif update.crowd_level == 'Medium' %}
+                                                        <span class="badge badge-medium">🟡 Medium</span>
+                                                    {% else %}
+                                                        <span class="badge badge-high">🔴 High</span>
+                                                    {% endif %}
+                                                </td>
+                                                <td>{{ update.platform_no or '-' }}</td>
+                                                <td>{{ update.train_name or '-' }}</td>
+                                                <td>
+                                                    <small>{{ update.update_time }}</small>
+                                                </td>
+                                            </tr>
+                                            {% if update.remarks %}
+                                                <tr>
+                                                    <td colspan="5" class="text-muted">
+                                                        <small><i class="fas fa-comment"></i> {{ update.remarks }}</small>
+                                                    </td>
+                                                </tr>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% else %}
+                                        <tr>
+                                            <td colspan="5" class="text-center">No updates yet</td>
+                                        </tr>
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy;Smart Railway System</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Dynamic platform loading
+        const platformData = {
+            'Chennai Central': ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'],
+            'Chennai Egmore': ['1', '2', '3', '4', '5', '6'],
+            'Coimbatore Junction': ['1', '2', '3', '4', '5', '6'],
+            'Madurai Junction': ['1', '2', '3', '4', '5'],
+            'Trichy Junction': ['1', '2', '3', '4'],
+            'Salem Junction': ['1', '2', '3', '4'],
+            'Tambaram': ['1', '2', '3'],
+            'Erode Junction': ['1', '2', '3', '4'],
+            'Tiruppur': ['1', '2'],
+            'Villupuram Junction': ['1', '2', '3', '4'],
+            'Thanjavur': ['1', '2'],
+            'Kumbakonam': ['1', '2'],
+            'Dindigul Junction': ['1', '2', '3'],
+            'Karur': ['1', '2'],
+            'Kanchipuram': ['1'],
+            'Chengalpattu': ['1', '2', '3'],
+            'Katpadi Junction': ['1', '2', '3', '4'],
+            'Arakkonam': ['1', '2', '3'],
+            'Nagercoil Junction': ['1', '2'],
+            'Rameswaram': ['1'],
+            'Tuticorin': ['1', '2'],
+            'Kanyakumari': ['1']
+        };
+
+        document.getElementById('stationSelect').addEventListener('change', function() {
+            const station = this.value;
+            const platformSelect = document.getElementById('platformSelect');
+            
+            platformSelect.innerHTML = '<option value="">Select Platform</option>';
+            
+            if (station && platformData[station]) {
+                platformData[station].forEach(platform => {
+                    const option = document.createElement('option');
+                    option.value = platform;
+                    option.textContent = 'Platform ' + platform;
+                    platformSelect.appendChild(option);
+                });
+            }
+        });
+    </script>
+</body>
+</html>

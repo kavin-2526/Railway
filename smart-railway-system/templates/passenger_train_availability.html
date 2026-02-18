@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Train Availability - Smart Railway System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .availability-card {
+            transition: all 0.3s ease;
+            border-left: 4px solid #3b82f6;
+        }
+        .availability-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+        .seats-info {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        .available { color: #10b981; }
+        .moderate { color: #f59e0b; }
+        .limited { color: #ef4444; }
+        .time-info {
+            font-size: 0.9rem;
+            color: #6b7280;
+        }
+        .time-badge {
+            background-color: #e3f2fd;
+            color: #1976d2;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+        .train-schedule-link {
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-train"></i> Smart Railway System
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/passenger/view">View Crowd</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/passenger/train-availability">Train Availability</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/train-schedule">Train Schedule</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/passenger/ticket-booking">Book Ticket</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-chart-bar"></i> Check Train Seat Availability
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> <strong>Real-time Updates:</strong> View live seat availability with train timings for all Tamil Nadu trains. Plan your journey better!
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <input type="text" class="form-control" id="searchTrain" 
+                               placeholder="🔍 Search by train name or number...">
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-select" id="filterAvailability">
+                            <option value="">All Trains</option>
+                            <option value="high">High Availability (70%+)</option>
+                            <option value="moderate">Moderate (30-70%)</option>
+                            <option value="low">Limited (Below 30%)</option>
+                        </select>
+                    </div>
+                    <div class="col-md-5 text-end">
+                        <button class="btn btn-primary" onclick="refreshAvailability()">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                        <a href="/passenger/ticket-booking" class="btn btn-success">
+                            <i class="fas fa-ticket"></i> Book Ticket
+                        </a>
+                        <a href="/train-schedule" class="btn btn-info ms-2">
+                            <i class="fas fa-clock"></i> View Schedule
+                        </a>
+                    </div>
+                </div>
+
+                <div id="trainAvailability" class="row g-4">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Links -->
+        <div class="row mt-4">
+            <div class="col-md-3 mb-3">
+                <a href="/passenger/view" class="text-decoration-none">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <i class="fas fa-users fa-3x mb-3" style="color: #3b82f6;"></i>
+                            <h5>Crowd Status</h5>
+                            <p class="text-muted">View station crowd levels</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <div class="col-md-3 mb-3">
+                <a href="/train-schedule" class="text-decoration-none">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <i class="fas fa-clock fa-3x mb-3" style="color: #8b5cf6;"></i>
+                            <h5>Train Schedule</h5>
+                            <p class="text-muted">View train timings</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <div class="col-md-3 mb-3">
+                <a href="/passenger/ticket-booking" class="text-decoration-none">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <i class="fas fa-ticket fa-3x mb-3" style="color: #10b981;"></i>
+                            <h5>Book Ticket</h5>
+                            <p class="text-muted">Quick ticket booking</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <div class="col-md-3 mb-3">
+                <a href="/passenger/emergency" class="text-decoration-none">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <i class="fas fa-exclamation-triangle fa-3x mb-3" style="color: #ef4444;"></i>
+                            <h5>Emergency Alert</h5>
+                            <p class="text-muted">Report emergencies</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy;Smart Railway System</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        async function loadAvailability() {
+            try {
+                const response = await fetch('/api/train-availability');
+                const trains = await response.json();
+                
+                const container = document.getElementById('trainAvailability');
+                container.innerHTML = '';
+                
+                trains.forEach(train => {
+                    const availablePercent = (train.available / train.total_seats) * 100;
+                    let statusClass = 'available';
+                    let statusText = 'High Availability';
+                    let statusIcon = 'fa-check-circle';
+                    let progressColor = 'bg-success';
+                    
+                    if (availablePercent < 30) {
+                        statusClass = 'limited';
+                        statusText = 'Limited Seats - Book Now!';
+                        statusIcon = 'fa-exclamation-triangle';
+                        progressColor = 'bg-danger';
+                    } else if (availablePercent < 70) {
+                        statusClass = 'moderate';
+                        statusText = 'Moderate Availability';
+                        statusIcon = 'fa-info-circle';
+                        progressColor = 'bg-warning';
+                    }
+                    
+                    const card = `
+                        <div class="col-md-6 col-lg-4 train-item" 
+                             data-train="${train.name.toLowerCase()} ${train.number}" 
+                             data-availability="${statusClass}">
+                            <div class="card availability-card h-100">
+                                <div class="card-body">
+                                    <h5 class="mb-2">
+                                        <i class="fas fa-train"></i> ${train.name}
+                                        <span class="badge bg-secondary float-end">${train.number}</span>
+                                    </h5>
+                                    
+                                    <p class="text-muted mb-2">
+                                        <i class="fas fa-route"></i> ${train.route}
+                                    </p>
+                                    
+                                    <!-- Train Timing Information -->
+                                    <div class="time-info mb-3">
+                                        <div class="row text-center">
+                                            <div class="col-5">
+                                                <div class="time-badge">${train.departure_time}</div>
+                                                <small>Departure</small>
+                                            </div>
+                                            <div class="col-2">
+                                                <i class="fas fa-arrow-right text-muted"></i>
+                                            </div>
+                                            <div class="col-5">
+                                                <div class="time-badge">${train.arrival_time}</div>
+                                                <small>Arrival</small>
+                                            </div>
+                                        </div>
+                                        <div class="text-center mt-1">
+                                            <small><i class="fas fa-clock"></i> Duration: ${train.duration}</small>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="seats-info mb-3 ${statusClass}">
+                                        <i class="fas ${statusIcon}"></i> ${statusText}
+                                    </div>
+                                    
+                                    <div class="progress mb-2" style="height: 25px;">
+                                        <div class="progress-bar ${progressColor}" 
+                                             role="progressbar" 
+                                             style="width: ${train.percentage}%;"
+                                             aria-valuenow="${train.percentage}" 
+                                             aria-valuemin="0" 
+                                             aria-valuemax="100">
+                                            ${train.booked} / ${train.total_seats} seats
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row text-center mt-3">
+                                        <div class="col-4">
+                                            <strong>${train.total_seats}</strong><br>
+                                            <small class="text-muted">Total</small>
+                                        </div>
+                                        <div class="col-4">
+                                            <strong class="text-danger">${train.booked}</strong><br>
+                                            <small class="text-muted">Booked</small>
+                                        </div>
+                                        <div class="col-4">
+                                            <strong class="text-success">${train.available}</strong><br>
+                                            <small class="text-muted">Available</small>
+                                        </div>
+                                    </div>
+                                    
+                                    <hr>
+                                    
+                                    <div class="text-center">
+                                        <span class="badge ${progressColor} me-2">
+                                            ${train.percentage.toFixed(1)}% Occupied
+                                        </span>
+                                        <a href="/train-schedule/${train.number}" class="badge bg-info text-decoration-none train-schedule-link">
+                                            <i class="fas fa-clock"></i> Schedule
+                                        </a>
+                                    </div>
+                                    
+                                    <div class="d-grid gap-2 mt-3">
+                                        <a href="/passenger/ticket-booking" class="btn btn-success btn-sm">
+                                            <i class="fas fa-ticket"></i> Book Ticket Now
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    container.innerHTML += card;
+                });
+            } catch (error) {
+                console.error('Error loading availability:', error);
+                document.getElementById('trainAvailability').innerHTML = 
+                    '<div class="col-12"><div class="alert alert-danger">Error loading train availability</div></div>';
+            }
+        }
+        
+        function refreshAvailability() {
+            loadAvailability();
+        }
+        
+        // Search functionality
+        document.getElementById('searchTrain').addEventListener('input', filterTrains);
+        document.getElementById('filterAvailability').addEventListener('change', filterTrains);
+        
+        function filterTrains() {
+            const searchText = document.getElementById('searchTrain').value.toLowerCase();
+            const filterValue = document.getElementById('filterAvailability').value;
+            const items = document.querySelectorAll('.train-item');
+            
+            items.forEach(item => {
+                const trainName = item.getAttribute('data-train');
+                const availability = item.getAttribute('data-availability');
+                
+                const matchesSearch = trainName.includes(searchText);
+                let matchesFilter = true;
+                
+                if (filterValue === 'high') matchesFilter = availability === 'available';
+                else if (filterValue === 'moderate') matchesFilter = availability === 'moderate';
+                else if (filterValue === 'low') matchesFilter = availability === 'limited';
+                
+                if (matchesSearch && matchesFilter) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+        
+        // Load on page load
+        document.addEventListener('DOMContentLoaded', loadAvailability);
+        
+        // Auto-refresh every 60 seconds
+        setInterval(loadAvailability, 60000);
+    </script>
+</body>
+</html>

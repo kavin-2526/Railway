@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Reports - Smart Railway System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/admin/dashboard">
+                <i class="fas fa-train"></i> Smart Railway Admin
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="/admin/dashboard">Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/admin/crowd-update">Crowd Update</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/admin/alerts">Alerts</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/admin/blockchain">Blockchain</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/admin/train-availability">Train Availability</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="/admin/reports">Reports</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/admin/logout">Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <div><i class="fas fa-chart-line"></i> Admin Reports & Analytics</div>
+                <div>
+                    <a href="/admin/generate-report" class="btn btn-success btn-sm me-2">
+                        <i class="fas fa-file-alt"></i> Generate Full Report
+                    </a>
+                    <button onclick="window.print()" class="btn btn-primary btn-sm">
+                        <i class="fas fa-print"></i> Print
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Key Metrics -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card text-center">
+                    <div class="card-body" style="background: linear-gradient(135deg, #667eea, #764ba2); color: white;">
+                        <h2>₹{{ "{:,.2f}".format(total_revenue) }}</h2>
+                        <p>Total Revenue</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card text-center">
+                    <div class="card-body" style="background: linear-gradient(135deg, #f093fb, #f5576c); color: white;">
+                        <h2>{{ total_bookings }}</h2>
+                        <p>Total Bookings</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card text-center">
+                    <div class="card-body" style="background: linear-gradient(135deg, #4facfe, #00f2fe); color: white;">
+                        <h2>{{ total_alerts }}</h2>
+                        <p>Emergency Alerts</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Popular Trains -->
+        <div class="card mb-4">
+            <div class="card-header"><i class="fas fa-train"></i> Top 10 Popular Trains</div>
+            <div class="card-body">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Train Name</th>
+                            <th>Bookings</th>
+                            <th>Revenue</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for train in popular_trains %}
+                        <tr>
+                            <td>{{ loop.index }}</td>
+                            <td>{{ train.train_name }}</td>
+                            <td>{{ train.bookings }}</td>
+                            <td>₹{{ "{:,.2f}".format(train.revenue) }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Emergency Alerts -->
+        <div class="card mb-4">
+            <div class="card-header"><i class="fas fa-exclamation-triangle"></i> Emergency Alerts by Type</div>
+            <div class="card-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Count</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for alert in emergency_by_type %}
+                        <tr>
+                            <td>{{ alert.emergency_type }}</td>
+                            <td>{{ alert.count }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Crowd Statistics -->
+        <div class="card mb-4">
+            <div class="card-header"><i class="fas fa-users"></i> Crowd Updates by Station</div>
+            <div class="card-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Station</th>
+                            <th>Level</th>
+                            <th>Count</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for crowd in crowd_by_station %}
+                        <tr>
+                            <td>{{ crowd.station_name }}</td>
+                            <td>
+                                {% if crowd.crowd_level == 'Low' %}
+                                <span class="badge badge-success">Low</span>
+                                {% elif crowd.crowd_level == 'Medium' %}
+                                <span class="badge badge-warning">Medium</span>
+                                {% else %}
+                                <span class="badge badge-danger">High</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ crowd.count }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy;Smart Railway System</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,5 @@
+Flask==2.3.0
+Flask-Mail==0.9.1
+hashlib
+sqlite3
+datetime

@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Destination Alert - Smart Railway System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-train"></i> Smart Railway System
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/passenger/view">View Crowd</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/passenger/destination-alert">Destination Alert</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-bell"></i> Set Destination Alert
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> <strong>Never Miss Your Stop!</strong> 
+                            Register for destination alerts and receive notifications when you're approaching your station. Perfect for long journeys or if you tend to sleep during travel.
+                        </div>
+
+                        <form method="POST">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label class="form-label">
+                                            <i class="fas fa-user"></i> Passenger Name *
+                                        </label>
+                                        <input type="text" class="form-control" name="passenger_name" 
+                                               required placeholder="Enter your name">
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label class="form-label">
+                                            <i class="fas fa-phone"></i> Mobile Number *
+                                        </label>
+                                        <input type="tel" class="form-control" name="phone" 
+                                               required pattern="[0-9]{10}" placeholder="10-digit mobile number">
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12">
+                                    <div class="form-group mb-3">
+                                        <label class="form-label">
+                                            <i class="fas fa-envelope"></i> Email Address *
+                                        </label>
+                                        <input type="email" class="form-control" name="email" 
+                                               required placeholder="your@email.com">
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label class="form-label">
+                                            <i class="fas fa-map-marker-alt"></i> Destination Station *
+                                        </label>
+                                        <select class="form-select" name="destination_station" required>
+                                            <option value="">Select Your Destination</option>
+                                            <option value="Chennai Central">Chennai Central</option>
+                                            <option value="Chennai Egmore">Chennai Egmore</option>
+                                            <option value="Tambaram">Tambaram</option>
+                                            <option value="Bangalore City">Bangalore City</option>
+                                            <option value="Coimbatore Junction">Coimbatore Junction</option>
+                                            <option value="Madurai Junction">Madurai Junction</option>
+                                            <option value="Trichy Junction">Trichy Junction</option>
+                                            <option value="Salem Junction">Salem Junction</option>
+                                            <option value="Tiruppur">Tiruppur</option>
+                                            <option value="Erode Junction">Erode Junction</option>
+                                            <option value="Kanyakumari">Kanyakumari</option>
+                                            <option value="Rameswaram">Rameswaram</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label class="form-label">
+                                            <i class="fas fa-train"></i> Train Name/Number
+                                        </label>
+                                        <input type="text" class="form-control" name="train_name" 
+                                               placeholder="e.g., Chennai Express / 12622">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="alert alert-warning mt-3">
+                                <strong><i class="fas fa-bell"></i> How Alerts Work:</strong>
+                                <ul class="mb-0 mt-2">
+                                    <li>📧 Email alert sent when approaching your destination</li>
+                                    <li>📱 SMS notification to your mobile number</li>
+                                    <li>⏰ Alert triggered approximately 15 minutes before arrival</li>
+                                    <li>🔔 Multiple notification channels for reliability</li>
+                                </ul>
+                            </div>
+
+                            <div class="d-grid gap-2 mt-4">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-bell"></i> SET DESTINATION ALERT
+                                </button>
+                                <a href="/" class="btn btn-secondary">
+                                    <i class="fas fa-times"></i> Cancel
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Benefits Card -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <i class="fas fa-star"></i> Why Use Destination Alerts?
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="text-center">
+                                    <i class="fas fa-bed fa-3x mb-2" style="color: #3b82f6;"></i>
+                                    <h6>Sleep Peacefully</h6>
+                                    <p class="text-muted">Travel comfortably without worrying about missing your station</p>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <div class="text-center">
+                                    <i class="fas fa-clock fa-3x mb-2" style="color: #10b981;"></i>
+                                    <h6>Timely Alerts</h6>
+                                    <p class="text-muted">Get notified well in advance to prepare for deboarding</p>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <div class="text-center">
+                                    <i class="fas fa-shield-alt fa-3x mb-2" style="color: #f59e0b;"></i>
+                                    <h6>Reliable System</h6>
+                                    <p class="text-muted">Multiple notification channels ensure you never miss alerts</p>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <div class="text-center">
+                                    <i class="fas fa-mobile-alt fa-3x mb-2" style="color: #8b5cf6;"></i>
+                                    <h6>Easy Setup</h6>
+                                    <p class="text-muted">Simple registration process, works on all devices</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Travel Tips -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <i class="fas fa-lightbulb"></i> Travel Tips
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6><i class="fas fa-check-circle" style="color: #10b981;"></i> Before Journey</h6>
+                                <ul>
+                                    <li>Set up alert at least 1 hour before departure</li>
+                                    <li>Verify your contact details are correct</li>
+                                    <li>Keep your phone charged and accessible</li>
+                                    <li>Enable notifications on your device</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h6><i class="fas fa-info-circle" style="color: #3b82f6;"></i> During Journey</h6>
+                                <ul>
+                                    <li>Keep phone volume on or vibration enabled</li>
+                                    <li>Check email notifications regularly</li>
+                                    <li>Inform co-passengers about your destination</li>
+                                    <li>Prepare luggage when alert is received</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy;Smart Railway System</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

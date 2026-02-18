@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Women Safety Alert - Smart Railway System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-train"></i> Smart Railway System
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/passenger/view">View Crowd</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/passenger/women-safety">Women Safety</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header" style="background: linear-gradient(135deg, #be123c, #dc2626);">
+                        <i class="fas fa-user-shield"></i> Women Safety Alert System
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-danger">
+                            <strong><i class="fas fa-bell"></i> Urgent Safety Feature</strong>
+                            <p class="mb-0">This is a dedicated safety alert system for women passengers. Upon submission, police and railway security will be immediately notified with your location details. Help will be dispatched right away.</p>
+                        </div>
+
+                        <form method="POST" id="safetyForm">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label class="form-label">
+                                            <i class="fas fa-user"></i> Your Name *
+                                        </label>
+                                        <input type="text" class="form-control" name="passenger_name" 
+                                               required placeholder="Enter your name">
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label class="form-label">
+                                            <i class="fas fa-phone"></i> Contact Number *
+                                        </label>
+                                        <input type="tel" class="form-control" name="phone" 
+                                               required placeholder="10-digit mobile" pattern="[0-9]{10}">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label class="form-label">
+                                            <i class="fas fa-train"></i> Train Number
+                                        </label>
+                                        <input type="text" class="form-control" name="train_no" 
+                                               placeholder="e.g., 12622">
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label class="form-label">
+                                            <i class="fas fa-hashtag"></i> Coach Number
+                                        </label>
+                                        <input type="text" class="form-control" name="coach_no" 
+                                               placeholder="e.g., B5, S7">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label class="form-label">
+                                    <i class="fas fa-map-marker-alt"></i> Current Location *
+                                </label>
+                                <input type="text" class="form-control" name="location" 
+                                       required placeholder="Be as specific as possible (Platform/Coach/Station)">
+                            </div>
+
+                            <div class="form-group mb-4">
+                                <label class="form-label">
+                                    <i class="fas fa-comment-dots"></i> Describe the Situation *
+                                </label>
+                                <textarea class="form-control" name="description" rows="4" 
+                                          required placeholder="Describe what is happening. Be as detailed as possible."></textarea>
+                            </div>
+
+                            <div class="alert alert-info">
+                                <strong><i class="fas fa-shield-alt"></i> Immediate Actions Taken:</strong>
+                                <ul class="mb-0 mt-2">
+                                    <li>⚡ Police Control Room alerted instantly</li>
+                                    <li>🚨 Railway Security notified immediately</li>
+                                    <li>📍 Your location shared with response teams</li>
+                                    <li>👮 Nearest officers dispatched to your location</li>
+                                    <li>🔒 Alert stored securely on blockchain</li>
+                                </ul>
+                            </div>
+
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-danger btn-lg">
+                                    <i class="fas fa-bell"></i> SEND SAFETY ALERT NOW
+                                </button>
+                                <a href="/" class="btn btn-secondary">
+                                    <i class="fas fa-times"></i> Cancel
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Safety Tips -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <i class="fas fa-lightbulb"></i> Safety Tips for Women Travelers
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6><i class="fas fa-check-circle" style="color: #10b981;"></i> Do's</h6>
+                                <ul>
+                                    <li>Travel in ladies compartment when available</li>
+                                    <li>Keep emergency contacts saved on your phone</li>
+                                    <li>Stay in well-lit areas of the station</li>
+                                    <li>Inform family about your journey details</li>
+                                    <li>Keep railway security number handy: 1512</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h6><i class="fas fa-times-circle" style="color: #ef4444;"></i> Don'ts</h6>
+                                <ul>
+                                    <li>Don't travel alone late at night if possible</li>
+                                    <li>Don't accept food/drinks from strangers</li>
+                                    <li>Don't share personal information unnecessarily</li>
+                                    <li>Don't ignore uncomfortable situations</li>
+                                    <li>Don't hesitate to seek help when needed</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Emergency Contacts -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <i class="fas fa-phone-volume"></i> Important Safety Contacts
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4 mb-3 text-center">
+                                <i class="fas fa-shield-alt fa-3x mb-2" style="color: #dc2626;"></i>
+                                <h6>Women Helpline</h6>
+                                <a href="tel:1091" class="btn btn-danger">📞 1091</a>
+                            </div>
+                            <div class="col-md-4 mb-3 text-center">
+                                <i class="fas fa-train fa-3x mb-2" style="color: #3b82f6;"></i>
+                                <h6>Railway Security</h6>
+                                <a href="tel:1512" class="btn btn-primary">📞 1512</a>
+                            </div>
+                            <div class="col-md-4 mb-3 text-center">
+                                <i class="fas fa-phone fa-3x mb-2" style="color: #10b981;"></i>
+                                <h6>Police Control</h6>
+                                <a href="tel:100" class="btn btn-success">📞 100</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy;Smart Railway System - Your Safety is Our Priority</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('safetyForm').addEventListener('submit', function(e) {
+            if (!confirm('Sending safety alert. Police and railway security will be immediately notified. Continue?')) {
+                e.preventDefault();
+            }
+        });
+    </script>
+</body>
+</html>

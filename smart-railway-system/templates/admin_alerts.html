@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Alerts - Smart Railway System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/admin/dashboard">Smart Railway Admin
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/dashboard">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/crowd-update">Crowd Update</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/admin/alerts">Alerts</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/blockchain">Blockchain</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/train-availability">Train Availability</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/logout">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Emergency Alerts -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-exclamation-triangle"></i> Emergency Alerts Management
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Passenger</th>
+                                <th>Phone</th>
+                                <th>Location</th>
+                                <th>Type</th>
+                                <th>Description</th>
+                                <th>Time</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if emergency_alerts %}
+                                {% for alert in emergency_alerts %}
+                                    <tr class="{% if alert.status == 'Pending' %}table-warning{% endif %}">
+                                        <td><strong>#{{ alert.id }}</strong></td>
+                                        <td>{{ alert.passenger_name }}</td>
+                                        <td><a href="tel:{{ alert.phone }}">{{ alert.phone }}</a></td>
+                                        <td><i class="fas fa-map-marker-alt"></i> {{ alert.location }}</td>
+                                        <td>
+                                            <span class="badge badge-danger">{{ alert.emergency_type }}</span>
+                                        </td>
+                                        <td>{{ alert.description[:50] }}...</td>
+                                        <td><small>{{ alert.alert_time }}</small></td>
+                                        <td>
+                                            {% if alert.status == 'Pending' %}
+                                                <span class="badge badge-warning">⏳ Pending</span>
+                                            {% elif alert.status == 'In Progress' %}
+                                                <span class="badge badge-info">🔄 In Progress</span>
+                                            {% else %}
+                                                <span class="badge badge-success">✅ Resolved</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm">
+                                                <a href="/admin/update-alert-status/emergency/{{ alert.id }}/In Progress" 
+                                                   class="btn btn-info" title="Mark In Progress">
+                                                    <i class="fas fa-spinner"></i>
+                                                </a>
+                                                <a href="/admin/update-alert-status/emergency/{{ alert.id }}/Resolved" 
+                                                   class="btn btn-success" title="Mark Resolved">
+                                                    <i class="fas fa-check"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="9" class="text-center">No emergency alerts</td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Women Safety Alerts -->
+        <div class="card mb-4">
+            <div class="card-header" style="background: linear-gradient(135deg, #be123c, #dc2626);">
+                <i class="fas fa-user-shield"></i> Women Safety Alerts Management
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Passenger</th>
+                                <th>Phone</th>
+                                <th>Train/Coach</th>
+                                <th>Location</th>
+                                <th>Description</th>
+                                <th>Police Notified</th>
+                                <th>Time</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if women_alerts %}
+                                {% for alert in women_alerts %}
+                                    <tr class="{% if alert.status == 'Active' %}table-danger{% endif %}">
+                                        <td><strong>#{{ alert.id }}</strong></td>
+                                        <td>{{ alert.passenger_name }}</td>
+                                        <td><a href="tel:{{ alert.phone }}">{{ alert.phone }}</a></td>
+                                        <td>
+                                            <i class="fas fa-train"></i> {{ alert.train_no or 'N/A' }}<br>
+                                            <i class="fas fa-hashtag"></i> Coach: {{ alert.coach_no or 'N/A' }}
+                                        </td>
+                                        <td><i class="fas fa-map-marker-alt"></i> {{ alert.location }}</td>
+                                        <td>{{ alert.description[:50] }}...</td>
+                                        <td>
+                                            <span class="badge badge-success">
+                                                <i class="fas fa-check"></i> {{ alert.police_notified }}
+                                            </span>
+                                        </td>
+                                        <td><small>{{ alert.alert_time }}</small></td>
+                                        <td>
+                                            {% if alert.status == 'Active' %}
+                                                <span class="badge badge-danger">🚨 Active</span>
+                                            {% elif alert.status == 'In Progress' %}
+                                                <span class="badge badge-warning">🔄 In Progress</span>
+                                            {% else %}
+                                                <span class="badge badge-success">✅ Resolved</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm">
+                                                <a href="/admin/update-alert-status/women/{{ alert.id }}/In Progress" 
+                                                   class="btn btn-warning" title="Mark In Progress">
+                                                    <i class="fas fa-spinner"></i>
+                                                </a>
+                                                <a href="/admin/update-alert-status/women/{{ alert.id }}/Resolved" 
+                                                   class="btn btn-success" title="Mark Resolved">
+                                                    <i class="fas fa-check"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="10" class="text-center">No women safety alerts</td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy;Smart Railway System - Admin Panel</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

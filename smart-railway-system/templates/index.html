@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Railway System - Home</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">Smart Railway System
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/passenger/view">View Crowd Status</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/login">Admin Login</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="container mt-4">
+        <div class="hero-section">
+            <h1><i class="fas fa-train-subway"></i> Smart Crowd Update & Safety Alert System</h1>
+            <p>Real-time crowd monitoring, safety alerts, and passenger services on a secure blockchain platform</p>
+            <a href="/passenger/view" class="btn btn-light btn-lg me-2">
+                <i class="fas fa-eye"></i> View Crowd Status
+            </a>
+            <a href="/passenger/ticket-booking" class="btn btn-success btn-lg">
+                <i class="fas fa-ticket"></i> Book Ticket
+            </a>
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <div class="container mt-5">
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="icon">
+                        <i class="fas fa-users" style="color: #3b82f6;"></i>
+                    </div>
+                    <h3>Crowd Updates</h3>
+                    <p>Get live updates on crowd levels at railway stations to plan your journey better</p>
+                    <a href="/passenger/view" class="btn btn-primary">View Now</a>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="icon">
+                        <i class="fas fa-shield-halved" style="color: #10b981;"></i>
+                    </div>
+                    <h3>Emergency Alerts</h3>
+                    <p>Instant emergency alert system to notify authorities during critical situations</p>
+                    <a href="/passenger/emergency" class="btn btn-success">Send Alert</a>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="icon">
+                        <i class="fas fa-user-shield" style="color: #ef4444;"></i>
+                    </div>
+                    <h3>Women Safety</h3>
+                    <p>Dedicated safety alert system with direct police and security notification</p>
+                    <a href="/passenger/women-safety" class="btn btn-danger">Safety Alert</a>
+                </div>
+            </div>
+
+<!-- Add this card with the other feature cards in templates/index.html -->
+<div class="col-md-4">
+    <div class="feature-card">
+        <div class="icon">
+            <i class="fas fa-chair" style="color: #14b8a6;"></i>
+        </div>
+        <h3>Train Seat Availability</h3>
+        <p>Check real-time seat availability on all Tamil Nadu trains</p>
+        <a href="/passenger/train-availability" class="btn" style="background-color: #14b8a6; color: white;">Check Availability
+        </a>
+    </div>
+</div>
+
+        
+
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="icon">
+                        <i class="fas fa-bell" style="color: #136c82;"></i>
+                    </div>
+                    <h3>Destination Alerts</h3>
+                    <p>Receive timely alerts when approaching your destination station</p>
+                    <a href="/passenger/destination-alert" class="btn btn-info">Set Alert</a>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="icon">
+                        <i class="fas fa-calendar-alt" style="color: #8b5cf6;"></i>
+                    </div>
+                    <h3>Train Schedules</h3>
+                    <p>View detailed train timings and platform information</p>
+                    <a href="/train-schedule" class="btn" style="background-color: #8b5cf6; color: white;">View Schedules
+                    </a>
+                </div>
+            </div>
+
+
+            
+    <!-- Quick Access Section -->
+    <div class="container mt-5 mb-5">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-rocket"></i> Quick Access
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <h5><i class="fas fa-user-tie"></i> For Railway Staff</h5>
+                        <p>Login to admin panel to update crowd information and manage alerts</p>
+                        <a href="/admin/login" class="btn btn-primary">
+                            <i class="fas fa-sign-in-alt"></i> Admin Login
+                        </a>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <h5><i class="fas fa-user-group"></i> For Passengers</h5>
+                        <p>Access all passenger services without any login required</p>
+                        <a href="/passenger/view" class="btn btn-success">
+                            <i class="fas fa-eye"></i> View Services
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+ 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+</body>
+
+</html>

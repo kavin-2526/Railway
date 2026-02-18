@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emergency Alert - Smart Railway System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-train"></i> Smart Railway System
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/passenger/view">View Crowd</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/passenger/emergency">Emergency</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header" style="background: linear-gradient(135deg, #dc2626, #ef4444);">
+                        <i class="fas fa-exclamation-triangle"></i> Emergency Alert System
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-danger">
+                            <strong><i class="fas fa-info-circle"></i> Important Notice:</strong>
+                            <p class="mb-0">Use this form only for genuine emergencies. Railway authorities and security will be immediately notified. Misuse of this system is a punishable offense.</p>
+                        </div>
+
+                        <form method="POST" id="emergencyForm">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label class="form-label">
+                                            <i class="fas fa-user"></i> Your Name *
+                                        </label>
+                                        <input type="text" class="form-control" name="passenger_name" 
+                                               required placeholder="Enter your full name">
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label class="form-label">
+                                            <i class="fas fa-phone"></i> Contact Number *
+                                        </label>
+                                        <input type="tel" class="form-control" name="phone" 
+                                               required placeholder="10-digit mobile number" pattern="[0-9]{10}">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label class="form-label">
+                                    <i class="fas fa-map-marker-alt"></i> Current Location *
+                                </label>
+                                <input type="text" class="form-control" name="location" 
+                                       required placeholder="e.g., Platform 3, Coach B5, Chennai Central">
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label class="form-label">
+                                    <i class="fas fa-exclamation-circle"></i> Emergency Type *
+                                </label>
+                                <select class="form-select" name="emergency_type" required>
+                                    <option value="">Select Emergency Type</option>
+                                    <option value="Medical Emergency">🏥 Medical Emergency</option>
+                                    <option value="Security Threat">🚨 Security Threat</option>
+                                    <option value="Accident">⚠️ Accident</option>
+                                    <option value="Fire">🔥 Fire</option>
+                                    <option value="Harassment">👮 Harassment</option>
+                                    <option value="Lost Child">👶 Lost Child</option>
+                                    <option value="Theft">💼 Theft/Robbery</option>
+                                    <option value="Other">❓ Other</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group mb-4">
+                                <label class="form-label">
+                                    <i class="fas fa-comment-dots"></i> Detailed Description *
+                                </label>
+                                <textarea class="form-control" name="description" rows="5" 
+                                          required placeholder="Please describe the emergency situation in detail..."></textarea>
+                            </div>
+
+                            <div class="alert alert-warning">
+                                <i class="fas fa-bell"></i> <strong>What happens next?</strong>
+                                <ul class="mb-0 mt-2">
+                                    <li>Railway authorities will be immediately notified</li>
+                                    <li>Security personnel will be dispatched to your location</li>
+                                    <li>Emergency services will be contacted if needed</li>
+                                    <li>You may receive a call for additional information</li>
+                                </ul>
+                            </div>
+
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-danger btn-lg">
+                                    <i class="fas fa-paper-plane"></i> SEND EMERGENCY ALERT
+                                </button>
+                                <a href="/" class="btn btn-secondary">
+                                    <i class="fas fa-times"></i> Cancel
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Emergency Contacts -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <i class="fas fa-phone-volume"></i> Emergency Contact Numbers
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-ambulance fa-2x me-3" style="color: #ef4444;"></i>
+                                    <div>
+                                        <strong>Medical Emergency</strong><br>
+                                        <a href="tel:108" class="text-decoration-none">📞 108</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-shield-alt fa-2x me-3" style="color: #3b82f6;"></i>
+                                    <div>
+                                        <strong>Railway Security</strong><br>
+                                        <a href="tel:1512" class="text-decoration-none">📞 1512</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-fire-extinguisher fa-2x me-3" style="color: #f59e0b;"></i>
+                                    <div>
+                                        <strong>Fire Emergency</strong><br>
+                                        <a href="tel:101" class="text-decoration-none">📞 101</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-user-shield fa-2x me-3" style="color: #10b981;"></i>
+                                    <div>
+                                        <strong>Women Helpline</strong><br>
+                                        <a href="tel:1091" class="text-decoration-none">📞 1091</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy;Smart Railway System</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('emergencyForm').addEventListener('submit', function(e) {
+            if (!confirm('Are you sure you want to send this emergency alert? Railway authorities will be immediately notified.')) {
+                e.preventDefault();
+            }
+        });
+    </script>
+</body>
+</html>
